@@ -1,5 +1,7 @@
 ---
 applyTo: implementation/**
+paths:
+  - "implementation/**"
 ---
 
 # 要件・構造・UI仕様の確認（実装前の必須条件）

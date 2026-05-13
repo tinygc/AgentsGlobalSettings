@@ -1,5 +1,7 @@
 ---
 applyTo: architecture/**
+paths:
+  - "architecture/**"
 ---
 
 # デフォルトアーキテクチャ

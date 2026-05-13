@@ -1,5 +1,7 @@
 ---
 applyTo: requirement/**
+paths:
+  - "requirement/**"
 ---
 
 # 要件定義ドキュメントの作成
