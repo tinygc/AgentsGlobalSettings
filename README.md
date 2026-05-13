@@ -24,8 +24,8 @@ knowledge.md              # 設定体系のリファレンスメモ
 ## インストール
 
 ```sh
-git clone https://github.com/tinygc/settings.git
-cd settings
+git clone https://github.com/tinygc/AgentsGlobalSettings.git
+cd AgentsGlobalSettings
 sh install.sh
 ```
 
