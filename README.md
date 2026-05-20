@@ -19,8 +19,7 @@ knowledge.md              # 設定体系のリファレンスメモ
   agents/                 # カスタムエージェント（*.agent.md）
   skills/                 # スキル定義（<name>/SKILL.md）
     orchestrate-workflow/ # V字開発フローの進行管理
-    validate-traceability/# 要件-設計-テスト-実装の追跡確認
-    session-retrospective/# セッション振り返りと改善反映
+    session-retrospective/ # セッション振り返りと改善反映
   hooks/                  # フック（.gitkeep）
 ```
 

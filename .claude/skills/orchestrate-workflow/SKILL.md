@@ -74,10 +74,10 @@
 1. セッション内で「進行が止まった点」「やり直しが発生した点」「ユーザーからの指摘」を抽出する
 2. 事実ベースで原因を分類する（指示不足、出力形式不一致、手順不足、制約未考慮など）
 3. 改善対象を以下から選ぶ
-	- Sub Agent 定義（`.claude/agents/*.agent.md`）
-	- Skill（`.claude/skills/*/SKILL.md`）
-	- Rule（`.claude/rules/*.instructions.md`）
-	- グローバル運用方針（`AGENTS.md`）
+  - Sub Agent 定義（`.claude/agents/*.agent.md`）
+  - Skill（`.claude/skills/*/SKILL.md`）
+  - Rule（`.claude/rules/*.instructions.md`）
+  - グローバル運用方針（`AGENTS.md`）
 4. 改善案を「最小変更」で文書化またはファイル更新する
 5. 改善案と実施結果をセッションログに残す
 
