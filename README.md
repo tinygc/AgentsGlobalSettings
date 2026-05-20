@@ -18,6 +18,9 @@ knowledge.md              # 設定体系のリファレンスメモ
   rules/                  # applyTo ルール（*.instructions.md）
   agents/                 # カスタムエージェント（*.agent.md）
   skills/                 # スキル定義（<name>/SKILL.md）
+    orchestrate-workflow/ # V字開発フローの進行管理
+    validate-traceability/# 要件-設計-テスト-実装の追跡確認
+    session-retrospective/# セッション振り返りと改善反映
   hooks/                  # フック（.gitkeep）
 ```
 
@@ -52,3 +55,13 @@ sh install.sh
 
 - POSIX sh
 - Linux / macOS
+
+## セッション改善運用
+
+Agent での作業後に、進行不良やユーザー指摘を次回運用へ反映する場合は、`.claude/skills/session-retrospective/SKILL.md` の形式で振り返りを実施する。
+
+- 反映先の例:
+  - Sub Agent 定義: `.claude/agents/*.agent.md`
+  - Skill 手順: `.claude/skills/*/SKILL.md`
+  - ルール: `.claude/rules/*.instructions.md`
+  - グローバル方針: `AGENTS.md`
