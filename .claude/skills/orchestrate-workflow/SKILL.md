@@ -31,7 +31,7 @@
 5. `ui-designer` を呼び出す
 6. `architect-reviewer` を呼び出す
 7. `ui-reviewer` を呼び出す
-8. `architect-reviewer` が `差し戻し` の場合は、指摘内容に応じて 4 または 5 に戻る
+8. architect-reviewer が 差し戻し の場合は、指定された担当（4 または 5）に戻る
 9. `ui-reviewer` が `差し戻し` の場合は、5 に戻る
 10. `test-designer` を呼び出す
 11. `test-reviewer` を呼び出す
