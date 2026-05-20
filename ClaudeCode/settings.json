@@ -74,9 +74,8 @@
       "Bash(gh issue edit:*)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(git remote set-url:*)",
       "Bash(git pull:*)",
-      "Bash(git reset:*)",
+      "Bash(git reset HEAD:*)",
       "Bash(git cherry-pick:*)",
       "mcp__github__create_pull_request",
       "mcp__github__get_issue",
@@ -97,7 +96,6 @@
       "mcp__serena__think_about_collected_information",
       "mcp__serena__find_file",
       "mcp__serena__think_about_task_adherence",
-      "mcp__serena__execute_shell_command",
       "mcp__serena__replace_symbol_body",
       "mcp__serena__think_about_whether_you_are_done",
       "mcp__serena__read_memory",
@@ -139,28 +137,15 @@
       "Bash(kill:*)",
       "Bash(killall:*)",
       "Bash(pkill:*)",
-      "Bash(npm install:*)",
-      "Bash(npm uninstall:*)",
-      "Bash(yarn add:*)",
-      "Bash(yarn remove:*)",
-      "Bash(pip install:*)",
-      "Bash(pip uninstall:*)",
-      "Bash(brew install:*)",
-      "Bash(brew uninstall:*)",
       "Bash(apt install:*)",
       "Bash(apt remove:*)",
       "Bash(git push:*)",
-      "Bash(git reset --hard:*)",
+      "Bash(git reset:*)",
       "Bash(git clean:*)",
       "Bash(git rebase -i:*)",
-      "Bash(git add -A:*)",
       "Bash(git commit:*)",
-      "Bash(docker run:*)",
-      "Bash(docker exec:*)",
-      "Bash(docker rm:*)",
-      "Bash(docker rmi:*)",
-      "Bash(docker-compose up:*)",
-      "Bash(docker-compose down:*)",
+      "Bash(git remote set-url:*)",
+      "mcp__serena__execute_shell_command",
       "Bash(systemctl:*)",
       "Bash(service:*)",
       "Bash(bash:*)",
@@ -178,13 +163,6 @@
     ]
   },
   "feedbackSurveyState": {
-    "lastShownTime": 1754026319384
-  },
-  "mcpServers": {
-    "screenshot": {
-      "command": "node",
-      "args": ["/path/to/your/mcp/screenshot/screenshot-server.js"],
-      "env": {}
-    }
+    "lastShownTime": 0
   }
 }
