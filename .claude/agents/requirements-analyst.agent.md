@@ -1,7 +1,7 @@
 ---
 name: requirements-analyst
 description: ユーザーヒアリングを通じて要件を洗い出し、requirement/REQUIREMENTS.md を作成します。要件定義フェーズで呼び出してください。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Write

@@ -1,7 +1,7 @@
 ---
 name: ui-designer
 description: 要件・アーキテクチャをもとに UI 仕様と画面遷移を設計し、design/UI_SPEC.md を作成します。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Write

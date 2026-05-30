@@ -1,7 +1,7 @@
 ---
 name: architect
 description: 要件定義書をもとに Clean Architecture ベースのシステム設計を行い、architecture/ARCHITECTURE.md を作成します。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Write
