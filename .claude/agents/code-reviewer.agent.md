@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: 実装コードがアーキテクチャに準拠し、テストが十分であるかをレビューします。implementer が完了した後に呼び出してください.
+description: 実装コードがアーキテクチャに準拠し、テストが十分であるかをレビューします。implementer が完了した後に呼び出してください。
 model: fable-5
 tools:
   - Read
