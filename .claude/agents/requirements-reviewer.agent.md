@@ -1,7 +1,7 @@
 ---
 name: requirements-reviewer
 description: 要件定義書の抜け漏れ・実現可能性・テスト設計への移行準備をレビューします。requirements-analyst が完了した後に呼び出してください。
-model: claude-opus-4-7
+model: fable-5
 tools:
   - Read
   - Grep

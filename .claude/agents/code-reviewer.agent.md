@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
-description: 実装コードがアーキテクチャに準拠し、テストが十分であるかをレビューします。implementer が完了した後に呼び出してください。
-model: claude-opus-4-7
+description: 実装コードがアーキテクチャに準拠し、テストが十分であるかをレビューします。implementer が完了した後に呼び出してください.
+model: fable-5
 tools:
   - Read
   - Grep
