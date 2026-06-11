@@ -1,7 +1,7 @@
 ---
 name: test-designer
 description: 要件定義書をもとにテストケースを設計し、test/TEST_SPEC.md を作成します。TDD のテスト仕様を担当します。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Write
