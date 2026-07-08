@@ -9,7 +9,7 @@ ChatGPTやGeminiなどのAIが「質問→回答で終わり」なのに対し�
 
 構成要素は LLM（頭脳）・Tools（手足）・Memory（記憶）・Instructions（行動ルール）の4つ。
 
-**本ドキュメントに記載されていることは、2026-5-13時点の情報をもとにしており、今後のアップデートで仕様やベストプラクティスが変わる可能性が高いので、最新情報は公式ドキュメントやコミュニティを参照することを推奨します。**
+**本ドキュメントの各セクションは、見出しや本文に記載した時点（記載のないものは 2026-05-13 時点）の情報をもとにしており、今後のアップデートで仕様やベストプラクティスが変わる可能性が高いので、最新情報は公式ドキュメントやコミュニティを参照することを推奨します。**
 
 ### 各構成要素の概要
 
@@ -145,6 +145,65 @@ Instructions とは、AI Agent に守らせたいルールや行動方針を記�
 - `claudeMdExcludes` 設定でモノレポ内の不要な CLAUDE.md を除外できる。
 - Plugin システム: マーケットプレイス経由で skills / agents / hooks / MCP サーバーを配布可能。`/plugin` で管理。
 - 組織全体への Managed CLAUDE.md 配布が可能（MDM経由、`/Library/Application Support/ClaudeCode/CLAUDE.md` 等）。`claudeMd` 設定キーで `managed-settings.json` 内にインラインで記述も可。
+
+### For OpenAI Codex CLI Agent
+
+#### 1. 全PJ共通（ホームディレクトリ）
+
+```text
+~/.codex/                    # CODEX_HOME 環境変数で変更可
+├── config.toml              # ユーザー共通設定（model・approval_policy・sandbox_mode・[mcp_servers] など）
+├── <profile>.config.toml    # プロファイル別設定（--profile <name> で選択）
+├── AGENTS.md                # ユーザー共通の指示（グローバル）
+├── AGENTS.override.md       # 存在する場合、AGENTS.md の代わりに読み込まれる（併読されない）
+├── prompts/
+│   └── *.md                 # カスタムプロンプト（/prompts:<名前> で呼び出し。※非推奨、skills 推奨）
+├── hooks.json               # ライフサイクルフック（config.toml 内 [hooks] でも可）
+├── auth.json                # 認証情報（OS キーチェーン利用時は不要）
+└── history.jsonl            # セッション履歴（永続化有効時）
+
+~/.agents/skills/
+└── <skill-name>/SKILL.md    # ユーザー共通スキル（Codex は .agents/skills 規約を参照）
+```
+
+- グローバルな指示は `~/.codex/AGENTS.md` に置く。Copilot / Claude が参照する `~/AGENTS.md` とはパスが別のため、Codex にも同じ指示を効かせるには `~/.codex/AGENTS.md` へ配置する必要がある。
+- スキルは `~/.codex/skills/` ではなく `~/.agents/skills/`（ユーザー）/ `/etc/codex/skills/`（システム）に置く。AGENTS.md エコシステム共通の `.agents/skills` 規約を採用している。
+
+#### 2. PJ固有（プロジェクトルート）
+
+```text
+[project]/
+├── AGENTS.md               # プロジェクト指示（リポジトリルート）
+├── AGENTS.override.md      # 存在する場合、AGENTS.md の代わりに読み込まれる（併読されない）
+├── .agents/
+│   └── skills/
+│       └── <skill-name>/SKILL.md  # プロジェクトスキル
+└── .codex/
+    ├── config.toml         # プロジェクト固有設定（trusted なPJのみロード）
+    └── hooks.json          # プロジェクト固有フック
+```
+
+- AGENTS.md はリポジトリルートから作業ディレクトリへ向かって各階層で探索され、ルート→下位の順に連結される（下位ディレクトリが優先）。各ディレクトリで採用されるのは1ファイルのみ。
+- サブディレクトリごとに AGENTS.md を置けば、その配下の作業にだけ効く指示を追加できる。探索は作業ディレクトリで止まり、未訪問のサブディレクトリまでは下らない。
+
+#### 3. 重要ポイント（2026-07-08時点）
+
+- **AGENTS.md 解決順**: 各階層で `AGENTS.override.md` → `AGENTS.md` → `project_doc_fallback_filenames` の順に探索し、最初の非空ファイルを採用する。グローバル（`~/.codex/`）でも同じ優先順位。
+- **サイズ上限**: 連結後の指示サイズは `project_doc_max_bytes`（既定 32 KiB）まで。上限到達で以降のファイルは読み込まれない。空ファイルはスキップ。
+- **フォールバック名**: `config.toml` の `project_doc_fallback_filenames`（例 `["TEAM_GUIDE.md", ".agents.md"]`）で AGENTS.md 不在時の代替名を指定できる。
+- **設定の優先順位（高→低）**: ①CLI フラグ / `--config`、②プロジェクト `.codex/config.toml`（ルート→CWD、trusted のみ）、③プロファイル `~/.codex/<name>.config.toml`、④ユーザー `~/.codex/config.toml`、⑤システム `/etc/codex/config.toml`、⑥組み込み既定値。
+- **主な config.toml キー**: `model` / `approval_policy`（`on-request` / `untrusted` / `never`）/ `sandbox_mode`（`workspace-write` など）/ `model_reasoning_effort` / `web_search` / `personality` / `[permissions.<name>]` / `[features]`（`shell_snapshot`、`memories` など）。
+- **MCP**: `config.toml` の `[mcp_servers]` テーブルで設定する（別ファイルではない）。Claude の `.mcp.json` や Copilot の `mcp-config.json` とは形式が異なる。
+- **Trust モデル**: プロジェクトスコープの `.codex/`（config・hooks・rules）は、そのプロジェクトが trusted の場合のみロードされる。
+- **プロンプト非推奨**: `~/.codex/prompts/*.md`（トップレベルのみ走査）は slash command として使えるが非推奨。再利用や暗黙呼び出しには Skills（`SKILL.md`）が推奨される。
+- **スキル呼び出し**: `/skills` または `$` でメンション。`description` にタスクが一致すると暗黙的に選択される。同名スキルが複数ロケーションにあるとマージされず両方が候補に出る。
+- **Claude 資産との非互換**: Codex は `.claude/skills/` と `.claude/agents/`（Sub Agent 定義）をロードしない。スキルを Codex でも使うには `~/.agents/skills/` へ配置が必要（本リポジトリでは `install.sh` が同期する）。Sub Agent に相当する仕組みは Codex に無いため、`.claude/agents/` の定義は Claude Code / Copilot 専用となる。
+
+- 参考: [Custom instructions with AGENTS.md – Codex](https://developers.openai.com/codex/guides/agents-md)
+- 参考: [Config basics – Codex](https://developers.openai.com/codex/config-basic)
+- 参考: [Configuration Reference – Codex](https://developers.openai.com/codex/config-reference)
+- 参考: [Agent Skills – Codex](https://developers.openai.com/codex/skills)
+- 参考: [Custom Prompts – Codex](https://developers.openai.com/codex/custom-prompts)
 
 ## MCP
 
