@@ -9,7 +9,7 @@ ChatGPTやGeminiなどのAIが「質問→回答で終わり」なのに対し�
 
 構成要素は LLM（頭脳）・Tools（手足）・Memory（記憶）・Instructions（行動ルール）の4つ。
 
-**本ドキュメントに記載されていることは、2026-5-13時点の情報をもとにしており、今後のアップデートで仕様やベストプラクティスが変わる可能性が高いので、最新情報は公式ドキュメントやコミュニティを参照することを推奨します。**
+**本ドキュメントの各セクションは、見出しや本文に記載した時点（記載のないものは 2026-05-13 時点）の情報をもとにしており、今後のアップデートで仕様やベストプラクティスが変わる可能性が高いので、最新情報は公式ドキュメントやコミュニティを参照することを推奨します。**
 
 ### 各構成要素の概要
 
@@ -155,7 +155,7 @@ Instructions とは、AI Agent に守らせたいルールや行動方針を記�
 ├── config.toml              # ユーザー共通設定（model・approval_policy・sandbox_mode・[mcp_servers] など）
 ├── <profile>.config.toml    # プロファイル別設定（--profile <name> で選択）
 ├── AGENTS.md                # ユーザー共通の指示（グローバル）
-├── AGENTS.override.md       # AGENTS.md を上書きするグローバル指示（存在すれば優先）
+├── AGENTS.override.md       # 存在する場合、AGENTS.md の代わりに読み込まれる（併読されない）
 ├── prompts/
 │   └── *.md                 # カスタムプロンプト（/prompts:<名前> で呼び出し。※非推奨、skills 推奨）
 ├── hooks.json               # ライフサイクルフック（config.toml 内 [hooks] でも可）
@@ -174,7 +174,7 @@ Instructions とは、AI Agent に守らせたいルールや行動方針を記�
 ```text
 [project]/
 ├── AGENTS.md               # プロジェクト指示（リポジトリルート）
-├── AGENTS.override.md      # AGENTS.md を上書きする指示（存在すれば優先）
+├── AGENTS.override.md      # 存在する場合、AGENTS.md の代わりに読み込まれる（併読されない）
 ├── .agents/
 │   └── skills/
 │       └── <skill-name>/SKILL.md  # プロジェクトスキル
