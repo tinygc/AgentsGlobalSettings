@@ -197,6 +197,7 @@ Instructions とは、AI Agent に守らせたいルールや行動方針を記�
 - **Trust モデル**: プロジェクトスコープの `.codex/`（config・hooks・rules）は、そのプロジェクトが trusted の場合のみロードされる。
 - **プロンプト非推奨**: `~/.codex/prompts/*.md`（トップレベルのみ走査）は slash command として使えるが非推奨。再利用や暗黙呼び出しには Skills（`SKILL.md`）が推奨される。
 - **スキル呼び出し**: `/skills` または `$` でメンション。`description` にタスクが一致すると暗黙的に選択される。同名スキルが複数ロケーションにあるとマージされず両方が候補に出る。
+- **Claude 資産との非互換**: Codex は `.claude/skills/` と `.claude/agents/`（Sub Agent 定義）をロードしない。スキルを Codex でも使うには `~/.agents/skills/` へ配置が必要（本リポジトリでは `install.sh` が同期する）。Sub Agent に相当する仕組みは Codex に無いため、`.claude/agents/` の定義は Claude Code / Copilot 専用となる。
 
 - 参考: [Custom instructions with AGENTS.md – Codex](https://developers.openai.com/codex/guides/agents-md)
 - 参考: [Config basics – Codex](https://developers.openai.com/codex/config-basic)
