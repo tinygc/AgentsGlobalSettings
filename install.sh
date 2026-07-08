@@ -4,6 +4,7 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CLAUDE_TARGET="$HOME/.claude"
+CODEX_TARGET="$HOME/.codex"
 BACKUP_ROOT="$HOME/.settings-backup"
 BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)"
 
@@ -59,3 +60,10 @@ copy_dir "$ROOT_DIR/.claude/hooks" "$CLAUDE_TARGET/hooks"
 copy_dir "$ROOT_DIR/.claude/skills" "$CLAUDE_TARGET/skills"
 
 printf 'Installed settings to %s\n' "$CLAUDE_TARGET"
+
+# OpenAI Codex CLI はグローバル指示を ~/.codex/AGENTS.md から読む（~/AGENTS.md は参照しない）。
+# 認証情報や config.toml を保持する ~/.codex/ は削除せず、AGENTS.md のみ差し替える。
+backup_existing "$CODEX_TARGET/AGENTS.md" "codex-AGENTS.md"
+copy_file "$ROOT_DIR/AGENTS.md" "$CODEX_TARGET/AGENTS.md"
+
+printf 'Installed Codex instructions to %s/AGENTS.md\n' "$CODEX_TARGET"
