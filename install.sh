@@ -80,7 +80,7 @@ mkdir -p "$CLAUDE_TARGET"
 
 copy_file "$ROOT_DIR/AGENTS.md" "$HOME/AGENTS.md"
 backup_existing "$COPILOT_WORKSPACE_TARGET" "github-copilot-instructions.md"
-copy_file "$ROOT_DIR/.github/copilot-instructions.md" "$COPILOT_WORKSPACE_TARGET"
+write_copilot_instructions "$ROOT_DIR/AGENTS.md" "$COPILOT_WORKSPACE_TARGET"
 backup_existing "$COPILOT_CLI_TARGET" "copilot-copilot-instructions.md"
 write_copilot_instructions "$ROOT_DIR/AGENTS.md" "$COPILOT_CLI_TARGET"
 backup_existing "$COPILOT_VSCODE_TARGET" "copilot-vscode-agents-global.instructions.md"

@@ -100,7 +100,7 @@ New-Item -ItemType Directory -Force -Path $ClaudeTarget | Out-Null
 
 Copy-FileStrict (Join-Path $RootDir "AGENTS.md") (Join-Path $HOME "AGENTS.md")
 Backup-Existing $CopilotWorkspaceTarget "github-copilot-instructions.md"
-Copy-FileStrict (Join-Path (Join-Path $RootDir ".github") "copilot-instructions.md") $CopilotWorkspaceTarget
+Write-CopilotInstructions (Join-Path $RootDir "AGENTS.md") $CopilotWorkspaceTarget
 Backup-Existing $CopilotCliTarget "copilot-copilot-instructions.md"
 Write-CopilotInstructions (Join-Path $RootDir "AGENTS.md") $CopilotCliTarget
 Backup-Existing $CopilotVsCodeTarget "copilot-vscode-agents-global.instructions.md"

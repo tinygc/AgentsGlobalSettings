@@ -65,7 +65,7 @@ Unblock-File .\install.ps1
 - 既存の `~/.claude/` はタイムスタンプ付きで `~/.settings-backup/` にバックアップされる
 - バックアップ後、`~/.claude/` は再作成され、このリポジトリ内の `.claude/` 配下がコピーされる
 - `AGENTS.md` は `~/AGENTS.md` にコピーされる
-- `.github/copilot-instructions.md` は GitHub Copilot 用に `~/.github/copilot-instructions.md` にコピーされる
+- GitHub Copilot 用の `~/.github/copilot-instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
 - GitHub Copilot CLI 用の `~/.copilot/copilot-instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
 - GitHub Copilot for VS Code 用の `~/.copilot/instructions/agents-global.instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
 - `AGENTS.md` は Codex 用に `~/.codex/AGENTS.md` にもコピーされる（既存があればバックアップ。`~/.codex/` 内の `config.toml` や `auth.json` は削除・変更しない）
