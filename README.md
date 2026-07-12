@@ -3,7 +3,7 @@
 Claude Code / GitHub Copilot / OpenAI Codex CLI 向けのグローバル設定リポジトリ。
 
 `install.sh` を実行すると、Claude Code / GitHub Copilot / OpenAI Codex CLI が同じ方針を読める場所へ設定を配置する。
-共通指示の正本は `AGENTS.md` とし、Claude Code は `~/.claude/CLAUDE.md` から import、GitHub Copilot は `~/.github/copilot-instructions.md`、OpenAI Codex CLI は `~/.codex/AGENTS.md` として同じ内容を参照する。
+共通指示の正本は `AGENTS.md` とし、Claude Code は `~/.claude/CLAUDE.md` から import、GitHub Copilot は `~/.github/copilot-instructions.md`、GitHub Copilot CLI は `AGENTS.md` から生成した `~/.copilot/copilot-instructions.md`、GitHub Copilot for VS Code は `~/.copilot/instructions/agents-global.instructions.md`、OpenAI Codex CLI は `~/.codex/AGENTS.md` として同じ内容を参照する。
 スキルは Claude Code 向けに `~/.claude/skills/`、Codex 向けに `~/.agents/skills/` へ配置する。
 
 ## 構成
@@ -13,7 +13,8 @@ AGENTS.md                 # グローバル共通指示（言語・トーン・�
 .github/
   copilot-instructions.md # GitHub Copilot 用の共通指示ミラー
 install.sh                # Linux / macOS / Git Bash 向けインストーラ
-install.ps1               # Windows PowerShell 向けインストーラ
+install.cmd               # Windows 向け起動ラッパー（ExecutionPolicy Bypass）
+install.ps1               # Windows PowerShell 向けインストーラ本体
 knowledge.md              # 設定体系のリファレンスメモ
 .claude/
   CLAUDE.md               # @../AGENTS.md を import
@@ -35,17 +36,29 @@ cd AgentsGlobalSettings
 sh install.sh
 ```
 
-Windows PowerShell では以下を実行する。
+Windows では以下を実行する。
+
+```bat
+.\install.cmd
+```
+
+PowerShell から `install.ps1` を直接実行して署名エラーが出る環境では、次のどちらかを使う。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+```powershell
+Unblock-File .\install.ps1
+.\install.ps1
 ```
 
 ### Windows 対応
 
 - `install.sh` は POSIX sh 向けのため、Windows では Git Bash または WSL から実行する
-- PowerShell のみで実行したい場合は `install.ps1` を使う
-- `install.sh` と `install.ps1` は同じ配置先へ同じ設定をコピーする
+- PowerShell の実行ポリシーで未署名スクリプトがブロックされる場合があるため、Windows ではまず `install.cmd` を使う
+- PowerShell のみで実行したい場合は `powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1` を使う
+- `install.sh` / `install.cmd` / `install.ps1` は同じ配置先へ同じ設定をコピーする
 
 ### インストール時の挙動
 
@@ -53,6 +66,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 - バックアップ後、`~/.claude/` は再作成され、このリポジトリ内の `.claude/` 配下がコピーされる
 - `AGENTS.md` は `~/AGENTS.md` にコピーされる
 - `.github/copilot-instructions.md` は GitHub Copilot 用に `~/.github/copilot-instructions.md` にコピーされる
+- GitHub Copilot CLI 用の `~/.copilot/copilot-instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
+- GitHub Copilot for VS Code 用の `~/.copilot/instructions/agents-global.instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
 - `AGENTS.md` は Codex 用に `~/.codex/AGENTS.md` にもコピーされる（既存があればバックアップ。`~/.codex/` 内の `config.toml` や `auth.json` は削除・変更しない）
 - `.claude/skills/` 配下の各スキルは Codex 用に `~/.agents/skills/` にもコピーされる（`~/.agents/skills/` 全体はバックアップされるが削除はされず、このリポジトリと同名のスキルのみ置き換える）
 
@@ -61,6 +76,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```text
 ~/AGENTS.md
 ~/.github/copilot-instructions.md
+~/.copilot/copilot-instructions.md
+~/.copilot/instructions/agents-global.instructions.md
 ~/.codex/AGENTS.md
 ~/.agents/skills/
 ~/.claude/CLAUDE.md
