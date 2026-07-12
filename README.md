@@ -12,7 +12,8 @@ Claude Code / GitHub Copilot / OpenAI Codex CLI 向けのグローバル設定�
 AGENTS.md                 # グローバル共通指示（言語・トーン・開発プロセス）
 .github/
   copilot-instructions.md # GitHub Copilot 用の共通指示ミラー
-install.sh                # インストーラ（バックアップ → 削除 → コピー）
+install.sh                # Linux / macOS / Git Bash 向けインストーラ
+install.ps1               # Windows PowerShell 向けインストーラ
 knowledge.md              # 設定体系のリファレンスメモ
 .claude/
   CLAUDE.md               # @../AGENTS.md を import
@@ -33,6 +34,18 @@ git clone https://github.com/tinygc/AgentsGlobalSettings.git
 cd AgentsGlobalSettings
 sh install.sh
 ```
+
+Windows PowerShell では以下を実行する。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+### Windows 対応
+
+- `install.sh` は POSIX sh 向けのため、Windows では Git Bash または WSL から実行する
+- PowerShell のみで実行したい場合は `install.ps1` を使う
+- `install.sh` と `install.ps1` は同じ配置先へ同じ設定をコピーする
 
 ### インストール時の挙動
 
@@ -61,8 +74,9 @@ sh install.sh
 
 ## 要件
 
-- POSIX sh
-- Linux / macOS
+- POSIX sh（`install.sh` を使う場合）
+- Windows PowerShell 5.1+ / PowerShell 7+（`install.ps1` を使う場合）
+- Linux / macOS / Windows
 
 ## セッション改善運用
 
