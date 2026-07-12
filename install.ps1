@@ -76,7 +76,7 @@ function Write-CopilotInstructions {
     "> Source of truth: ``AGENTS.md``",
     ""
   )
-  $body = Get-Content -LiteralPath $Source
+  $body = Get-Content -LiteralPath $Source -Encoding UTF8
   Set-Content -LiteralPath $Destination -Value ($header + $body) -Encoding UTF8
 }
 
