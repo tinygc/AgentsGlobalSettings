@@ -6,6 +6,7 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CLAUDE_TARGET="$HOME/.claude"
 CODEX_TARGET="$HOME/.codex"
 AGENTS_SKILLS_TARGET="$HOME/.agents/skills"
+COPILOT_TARGET="$HOME/.github/copilot-instructions.md"
 BACKUP_ROOT="$HOME/.settings-backup"
 BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)"
 
@@ -52,6 +53,8 @@ rm -rf "$CLAUDE_TARGET"
 mkdir -p "$CLAUDE_TARGET"
 
 copy_file "$ROOT_DIR/AGENTS.md" "$HOME/AGENTS.md"
+backup_existing "$COPILOT_TARGET" "copilot-instructions.md"
+copy_file "$ROOT_DIR/.github/copilot-instructions.md" "$COPILOT_TARGET"
 copy_file "$ROOT_DIR/.claude/CLAUDE.md" "$CLAUDE_TARGET/CLAUDE.md"
 copy_file "$ROOT_DIR/.claude/settings.json" "$CLAUDE_TARGET/settings.json"
 
@@ -65,6 +68,7 @@ copy_dir "$ROOT_DIR/.claude/hooks" "$CLAUDE_TARGET/hooks"
 copy_dir "$ROOT_DIR/.claude/skills" "$CLAUDE_TARGET/skills"
 
 printf 'Installed settings to %s\n' "$CLAUDE_TARGET"
+printf 'Installed GitHub Copilot instructions to %s\n' "$COPILOT_TARGET"
 
 # OpenAI Codex CLI はグローバル指示を ~/.codex/AGENTS.md から読む（~/AGENTS.md は参照しない）。
 # 認証情報や config.toml を保持する ~/.codex/ は削除せず、AGENTS.md のみ差し替える。
