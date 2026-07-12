@@ -2,14 +2,16 @@
 
 Claude Code / GitHub Copilot / OpenAI Codex CLI 向けのグローバル設定リポジトリ。
 
-`install.sh` を実行すると `~/.claude/` にルール・エージェント・スキルなどを配置し、あわせて `~/AGENTS.md` も更新する。  
-GitHub Copilot (VS Code) は `~/.claude/` を自動検出するため、両ツールで設定を共有できる。  
-OpenAI Codex CLI はグローバル指示を `~/.codex/AGENTS.md` から、スキルを `~/.agents/skills/` から読む（`~/AGENTS.md` と `~/.claude/skills/` は参照しない）ため、`install.sh` は `AGENTS.md` を `~/.codex/AGENTS.md` に、`.claude/skills/` 配下の各スキルを `~/.agents/skills/` にも配置する。
+`install.sh` を実行すると、Claude Code / GitHub Copilot / OpenAI Codex CLI が同じ方針を読める場所へ設定を配置する。
+共通指示の正本は `AGENTS.md` とし、Claude Code は `~/.claude/CLAUDE.md` から import、GitHub Copilot は `~/.github/copilot-instructions.md`、OpenAI Codex CLI は `~/.codex/AGENTS.md` として同じ内容を参照する。
+スキルは Claude Code 向けに `~/.claude/skills/`、Codex 向けに `~/.agents/skills/` へ配置する。
 
 ## 構成
 
 ```
 AGENTS.md                 # グローバル共通指示（言語・トーン・開発プロセス）
+.github/
+  copilot-instructions.md # GitHub Copilot 用の共通指示ミラー
 install.sh                # インストーラ（バックアップ → 削除 → コピー）
 knowledge.md              # 設定体系のリファレンスメモ
 .claude/
@@ -37,6 +39,7 @@ sh install.sh
 - 既存の `~/.claude/` はタイムスタンプ付きで `~/.settings-backup/` にバックアップされる
 - バックアップ後、`~/.claude/` は再作成され、このリポジトリ内の `.claude/` 配下がコピーされる
 - `AGENTS.md` は `~/AGENTS.md` にコピーされる
+- `.github/copilot-instructions.md` は GitHub Copilot 用に `~/.github/copilot-instructions.md` にコピーされる
 - `AGENTS.md` は Codex 用に `~/.codex/AGENTS.md` にもコピーされる（既存があればバックアップ。`~/.codex/` 内の `config.toml` や `auth.json` は削除・変更しない）
 - `.claude/skills/` 配下の各スキルは Codex 用に `~/.agents/skills/` にもコピーされる（`~/.agents/skills/` 全体はバックアップされるが削除はされず、このリポジトリと同名のスキルのみ置き換える）
 
@@ -44,6 +47,7 @@ sh install.sh
 
 ```text
 ~/AGENTS.md
+~/.github/copilot-instructions.md
 ~/.codex/AGENTS.md
 ~/.agents/skills/
 ~/.claude/CLAUDE.md
