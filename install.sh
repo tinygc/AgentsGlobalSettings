@@ -6,7 +6,9 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CLAUDE_TARGET="$HOME/.claude"
 CODEX_TARGET="$HOME/.codex"
 AGENTS_SKILLS_TARGET="$HOME/.agents/skills"
-COPILOT_TARGET="$HOME/.github/copilot-instructions.md"
+COPILOT_WORKSPACE_TARGET="$HOME/.github/copilot-instructions.md"
+COPILOT_CLI_TARGET="$HOME/.copilot/copilot-instructions.md"
+COPILOT_VSCODE_TARGET="$HOME/.copilot/instructions/agents-global.instructions.md"
 BACKUP_ROOT="$HOME/.settings-backup"
 BACKUP_DIR="$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)"
 
@@ -36,6 +38,30 @@ copy_dir() {
   cp -R "$src" "$dest"
 }
 
+write_copilot_instructions() {
+  src=$1
+  dest=$2
+  frontmatter=${3:-false}
+
+  if [ ! -f "$src" ]; then
+    printf 'missing source file: %s\n' "$src" >&2
+    exit 1
+  fi
+
+  mkdir -p "$(dirname -- "$dest")"
+  {
+    if [ "$frontmatter" = "true" ]; then
+      printf '%s\n' '---'
+      printf 'applyTo: "**"\n'
+      printf '%s\n\n' '---'
+    fi
+    printf '# GitHub Copilot instructions\n\n'
+    printf 'This file mirrors the shared global agent instructions used by Claude Code and OpenAI Codex.\n\n'
+    printf '> Source of truth: `AGENTS.md`\n\n'
+    cat "$src"
+  } > "$dest"
+}
+
 backup_existing() {
   src=$1
   name=$2
@@ -53,8 +79,12 @@ rm -rf "$CLAUDE_TARGET"
 mkdir -p "$CLAUDE_TARGET"
 
 copy_file "$ROOT_DIR/AGENTS.md" "$HOME/AGENTS.md"
-backup_existing "$COPILOT_TARGET" "copilot-instructions.md"
-copy_file "$ROOT_DIR/.github/copilot-instructions.md" "$COPILOT_TARGET"
+backup_existing "$COPILOT_WORKSPACE_TARGET" "github-copilot-instructions.md"
+write_copilot_instructions "$ROOT_DIR/AGENTS.md" "$COPILOT_WORKSPACE_TARGET"
+backup_existing "$COPILOT_CLI_TARGET" "copilot-copilot-instructions.md"
+write_copilot_instructions "$ROOT_DIR/AGENTS.md" "$COPILOT_CLI_TARGET"
+backup_existing "$COPILOT_VSCODE_TARGET" "copilot-vscode-agents-global.instructions.md"
+write_copilot_instructions "$ROOT_DIR/AGENTS.md" "$COPILOT_VSCODE_TARGET" true
 copy_file "$ROOT_DIR/.claude/CLAUDE.md" "$CLAUDE_TARGET/CLAUDE.md"
 copy_file "$ROOT_DIR/.claude/settings.json" "$CLAUDE_TARGET/settings.json"
 
@@ -68,7 +98,9 @@ copy_dir "$ROOT_DIR/.claude/hooks" "$CLAUDE_TARGET/hooks"
 copy_dir "$ROOT_DIR/.claude/skills" "$CLAUDE_TARGET/skills"
 
 printf 'Installed settings to %s\n' "$CLAUDE_TARGET"
-printf 'Installed GitHub Copilot instructions to %s\n' "$COPILOT_TARGET"
+printf 'Installed GitHub Copilot workspace instructions to %s\n' "$COPILOT_WORKSPACE_TARGET"
+printf 'Installed GitHub Copilot CLI instructions to %s\n' "$COPILOT_CLI_TARGET"
+printf 'Installed GitHub Copilot VS Code instructions to %s\n' "$COPILOT_VSCODE_TARGET"
 
 # OpenAI Codex CLI はグローバル指示を ~/.codex/AGENTS.md から読む（~/AGENTS.md は参照しない）。
 # 認証情報や config.toml を保持する ~/.codex/ は削除せず、AGENTS.md のみ差し替える。
