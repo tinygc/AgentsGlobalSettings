@@ -6,10 +6,7 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CLAUDE_TARGET="$HOME/.claude"
 CODEX_TARGET="$HOME/.codex"
 AGENTS_SKILLS_TARGET="$HOME/.agents/skills"
-<<<<<<< 6wpy5e-codex/reviewconflict
 CODEX_AGENTS_TARGET="$HOME/.codex/agents"
-=======
->>>>>>> master
 COPILOT_WORKSPACE_TARGET="$HOME/.github/copilot-instructions.md"
 COPILOT_CLI_TARGET="$HOME/.copilot/copilot-instructions.md"
 COPILOT_VSCODE_TARGET="$HOME/.copilot/instructions/agents-global.instructions.md"
