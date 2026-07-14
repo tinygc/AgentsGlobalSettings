@@ -4,7 +4,11 @@ Claude Code / GitHub Copilot / OpenAI Codex CLI 向けのグローバル設定�
 
 `install.sh` を実行すると、Claude Code / GitHub Copilot / OpenAI Codex CLI が同じ方針を読める場所へ設定を配置する。
 共通指示の正本は `AGENTS.md` とし、Claude Code は `~/.claude/CLAUDE.md` から import、GitHub Copilot は `~/.github/copilot-instructions.md`、GitHub Copilot CLI は `AGENTS.md` から生成した `~/.copilot/copilot-instructions.md`、GitHub Copilot for VS Code は `~/.copilot/instructions/agents-global.instructions.md`、OpenAI Codex CLI は `~/.codex/AGENTS.md` として同じ内容を参照する。
+<<<<<<< 6wpy5e-codex/reviewconflict
 スキルは Claude Code 向けに `~/.claude/skills/`、Codex 向けに `~/.agents/skills/` へ配置する。Sub Agent は Claude Code 向けに `~/.claude/agents/` へコピーし、Codex 向けには `.claude/agents/*.agent.md` から `~/.codex/agents/*.toml` を生成する。
+=======
+スキルは Claude Code 向けに `~/.claude/skills/`、Codex 向けに `~/.agents/skills/` へ配置する。
+>>>>>>> master
 
 ## 構成
 

@@ -4,7 +4,10 @@ $RootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ClaudeTarget = Join-Path $HOME ".claude"
 $CodexTarget = Join-Path $HOME ".codex"
 $AgentsSkillsTarget = Join-Path (Join-Path $HOME ".agents") "skills"
+<<<<<<< 6wpy5e-codex/reviewconflict
 $CodexAgentsTarget = Join-Path $CodexTarget "agents"
+=======
+>>>>>>> master
 $CopilotWorkspaceTarget = Join-Path (Join-Path $HOME ".github") "copilot-instructions.md"
 $CopilotCliTarget = Join-Path (Join-Path $HOME ".copilot") "copilot-instructions.md"
 $CopilotVsCodeTarget = Join-Path (Join-Path (Join-Path $HOME ".copilot") "instructions") "agents-global.instructions.md"
