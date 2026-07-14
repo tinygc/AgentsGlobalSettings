@@ -94,16 +94,21 @@ function Get-AgentFrontmatterValue {
     [Parameter(Mandatory = $true)][string]$Key
   )
 
-  if ($Lines.Count -eq 0 -or $Lines[0] -ne "---") {
+  if ($Lines.Count -eq 0 -or $Lines[0].TrimEnd("`r") -ne "---") {
     return $null
   }
 
   for ($i = 1; $i -lt $Lines.Count; $i++) {
-    if ($Lines[$i] -eq "---") {
+    $line = $Lines[$i].TrimEnd("`r")
+    if ($line -eq "---") {
       break
     }
-    if ($Lines[$i] -match "^$([regex]::Escape($Key)):\s*(.*)$") {
-      return $Matches[1]
+    if ($line -match "^$([regex]::Escape($Key)):\s*(.*)$") {
+      $value = $Matches[1].Trim()
+      if ($value -match '^"(.*)"$' -or $value -match "^'(.*)'$") {
+        return $Matches[1]
+      }
+      return $value
     }
   }
 
@@ -113,12 +118,12 @@ function Get-AgentFrontmatterValue {
 function Get-AgentBody {
   param([Parameter(Mandatory = $true)][string[]]$Lines)
 
-  if ($Lines.Count -eq 0 -or $Lines[0] -ne "---") {
+  if ($Lines.Count -eq 0 -or $Lines[0].TrimEnd("`r") -ne "---") {
     return $Lines
   }
 
   for ($i = 1; $i -lt $Lines.Count; $i++) {
-    if ($Lines[$i] -eq "---") {
+    if ($Lines[$i].TrimEnd("`r") -eq "---") {
       if ($i + 1 -lt $Lines.Count) {
         return $Lines[($i + 1)..($Lines.Count - 1)]
       }
@@ -139,7 +144,7 @@ function Write-CodexAgent {
     throw "missing source file: $Source"
   }
 
-  $lines = Get-Content -LiteralPath $Source -Encoding UTF8
+  $lines = @(Get-Content -LiteralPath $Source -Encoding UTF8)
   $sourceLeaf = Split-Path -Leaf $Source
   $fileBaseName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($sourceLeaf))
   $agentName = Get-AgentFrontmatterValue $lines "name"

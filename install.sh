@@ -70,14 +70,30 @@ toml_escape_basic_string() {
 agent_frontmatter_value() {
   key=$1
   src=$2
-  awk -v key="$key" '
-    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
-    in_frontmatter && $0 == "---" { exit }
+  awk -v key="$key" -v q="'" '
+    NR == 1 {
+      line = $0
+      sub(/\r$/, "", line)
+      if (line == "---") {
+        in_frontmatter = 1
+        next
+      }
+      exit
+    }
     in_frontmatter {
+      line = $0
+      sub(/\r$/, "", line)
+      if (line == "---") {
+        exit
+      }
       pattern = "^" key ":[[:space:]]*"
-      if ($0 ~ pattern) {
-        sub(pattern, "")
-        print
+      if (line ~ pattern) {
+        sub(pattern, "", line)
+        sub(/[[:space:]]*$/, "", line)
+        if ((line ~ /^"[^"]*"$/) || (line ~ "^" q "[^" q "]*" q "$")) {
+          line = substr(line, 2, length(line) - 2)
+        }
+        print line
         exit
       }
     }
@@ -87,10 +103,25 @@ agent_frontmatter_value() {
 write_agent_body() {
   src=$1
   awk '
-    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
-    in_frontmatter && $0 == "---" { in_frontmatter = 0; in_body = 1; next }
-    in_body { print; next }
-    !in_frontmatter && NR != 1 { print }
+    {
+      line = $0
+      sub(/\r$/, "", line)
+    }
+    NR == 1 {
+      if (line == "---") {
+        in_frontmatter = 1
+        next
+      }
+      print line
+      next
+    }
+    in_frontmatter {
+      if (line == "---") {
+        in_frontmatter = 0
+      }
+      next
+    }
+    { print line }
   ' "$src"
 }
 
