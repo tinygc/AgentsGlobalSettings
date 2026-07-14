@@ -147,15 +147,15 @@ function Write-CodexAgent {
   $lines = @(Get-Content -LiteralPath $Source -Encoding UTF8)
   $sourceLeaf = Split-Path -Leaf $Source
   $fileBaseName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($sourceLeaf))
-  $agentName = Get-AgentFrontmatterValue $lines "name"
+  $agentName = Get-AgentFrontmatterValue -Lines $lines -Key "name"
   if (-not $agentName) {
     $agentName = $fileBaseName
   }
-  $description = Get-AgentFrontmatterValue $lines "description"
+  $description = Get-AgentFrontmatterValue -Lines $lines -Key "description"
   if (-not $description) {
     $description = "Imported from Claude agent $fileBaseName."
   }
-  $body = Get-AgentBody $lines
+  $body = Get-AgentBody -Lines $lines
 
   $parent = Split-Path -Parent $Destination
   if ($parent) {
