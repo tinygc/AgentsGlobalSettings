@@ -4,6 +4,10 @@ $RootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ClaudeTarget = Join-Path $HOME ".claude"
 $CodexTarget = Join-Path $HOME ".codex"
 $AgentsSkillsTarget = Join-Path (Join-Path $HOME ".agents") "skills"
+<<<<<<< 6wpy5e-codex/reviewconflict
+$CodexAgentsTarget = Join-Path $CodexTarget "agents"
+=======
+>>>>>>> master
 $CopilotWorkspaceTarget = Join-Path (Join-Path $HOME ".github") "copilot-instructions.md"
 $CopilotCliTarget = Join-Path (Join-Path $HOME ".copilot") "copilot-instructions.md"
 $CopilotVsCodeTarget = Join-Path (Join-Path (Join-Path $HOME ".copilot") "instructions") "agents-global.instructions.md"
@@ -81,6 +85,95 @@ function Write-CopilotInstructions {
   Set-Content -LiteralPath $Destination -Value ($header + $body) -Encoding UTF8
 }
 
+function ConvertTo-TomlBasicString {
+  param([Parameter(Mandatory = $true)][string]$Value)
+
+  return $Value.Replace('\', '\\').Replace('"', '\"')
+}
+
+function Get-AgentFrontmatterValue {
+  param(
+    [Parameter(Mandatory = $true)][string[]]$Lines,
+    [Parameter(Mandatory = $true)][string]$Key
+  )
+
+  if ($Lines.Count -eq 0 -or $Lines[0].TrimEnd("`r") -ne "---") {
+    return $null
+  }
+
+  for ($i = 1; $i -lt $Lines.Count; $i++) {
+    $line = $Lines[$i].TrimEnd("`r")
+    if ($line -eq "---") {
+      break
+    }
+    if ($line -match "^$([regex]::Escape($Key)):\s*(.*)$") {
+      $value = $Matches[1].Trim()
+      if ($value -match '^"(.*)"$' -or $value -match "^'(.*)'$") {
+        return $Matches[1]
+      }
+      return $value
+    }
+  }
+
+  return $null
+}
+
+function Get-AgentBody {
+  param([Parameter(Mandatory = $true)][string[]]$Lines)
+
+  if ($Lines.Count -eq 0 -or $Lines[0].TrimEnd("`r") -ne "---") {
+    return $Lines
+  }
+
+  for ($i = 1; $i -lt $Lines.Count; $i++) {
+    if ($Lines[$i].TrimEnd("`r") -eq "---") {
+      if ($i + 1 -lt $Lines.Count) {
+        return $Lines[($i + 1)..($Lines.Count - 1)]
+      }
+      return @()
+    }
+  }
+
+  return $Lines
+}
+
+function Write-CodexAgent {
+  param(
+    [Parameter(Mandatory = $true)][string]$Source,
+    [Parameter(Mandatory = $true)][string]$Destination
+  )
+
+  if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
+    throw "missing source file: $Source"
+  }
+
+  $lines = @(Get-Content -LiteralPath $Source -Encoding UTF8)
+  $sourceLeaf = Split-Path -Leaf $Source
+  $fileBaseName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($sourceLeaf))
+  $agentName = Get-AgentFrontmatterValue $lines "name"
+  if (-not $agentName) {
+    $agentName = $fileBaseName
+  }
+  $description = Get-AgentFrontmatterValue $lines "description"
+  if (-not $description) {
+    $description = "Imported from Claude agent $fileBaseName."
+  }
+  $body = Get-AgentBody $lines
+
+  $parent = Split-Path -Parent $Destination
+  if ($parent) {
+    New-Item -ItemType Directory -Force -Path $parent | Out-Null
+  }
+
+  $content = @(
+    "name = `"$(ConvertTo-TomlBasicString $agentName)`"",
+    "description = `"$(ConvertTo-TomlBasicString $description)`"",
+    "developer_instructions = '''"
+  ) + $body + @("'''", "")
+
+  Set-Content -LiteralPath $Destination -Value $content -Encoding UTF8
+}
+
 function Backup-Existing {
   param(
     [Parameter(Mandatory = $true)][string]$Source,
@@ -127,6 +220,17 @@ Backup-Existing (Join-Path $CodexTarget "AGENTS.md") "codex-AGENTS.md"
 Copy-FileStrict (Join-Path $RootDir "AGENTS.md") (Join-Path $CodexTarget "AGENTS.md")
 
 Write-Host "Installed Codex instructions to $(Join-Path $CodexTarget "AGENTS.md")"
+
+Backup-Existing $CodexAgentsTarget "codex-agents"
+New-Item -ItemType Directory -Force -Path $CodexAgentsTarget | Out-Null
+$SourceAgents = Join-Path (Join-Path $RootDir ".claude") "agents"
+Get-ChildItem -LiteralPath $SourceAgents -Filter "*.agent.md" -File | ForEach-Object {
+  $AgentName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($_.Name))
+  $AgentTarget = Join-Path $CodexAgentsTarget "$AgentName.toml"
+  Write-CodexAgent $_.FullName $AgentTarget
+}
+
+Write-Host "Installed Codex agents to $CodexAgentsTarget"
 
 Backup-Existing $AgentsSkillsTarget "agents-skills"
 New-Item -ItemType Directory -Force -Path $AgentsSkillsTarget | Out-Null

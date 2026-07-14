@@ -4,7 +4,11 @@ Claude Code / GitHub Copilot / OpenAI Codex CLI 向けのグローバル設定�
 
 `install.sh` を実行すると、Claude Code / GitHub Copilot / OpenAI Codex CLI が同じ方針を読める場所へ設定を配置する。
 共通指示の正本は `AGENTS.md` とし、Claude Code は `~/.claude/CLAUDE.md` から import、GitHub Copilot は `~/.github/copilot-instructions.md`、GitHub Copilot CLI は `AGENTS.md` から生成した `~/.copilot/copilot-instructions.md`、GitHub Copilot for VS Code は `~/.copilot/instructions/agents-global.instructions.md`、OpenAI Codex CLI は `~/.codex/AGENTS.md` として同じ内容を参照する。
+<<<<<<< 6wpy5e-codex/reviewconflict
+スキルは Claude Code 向けに `~/.claude/skills/`、Codex 向けに `~/.agents/skills/` へ配置する。Sub Agent は Claude Code 向けに `~/.claude/agents/` へコピーし、Codex 向けには `.claude/agents/*.agent.md` から `~/.codex/agents/*.toml` を生成する。
+=======
 スキルは Claude Code 向けに `~/.claude/skills/`、Codex 向けに `~/.agents/skills/` へ配置する。
+>>>>>>> master
 
 ## 構成
 
@@ -69,6 +73,7 @@ Unblock-File .\install.ps1
 - GitHub Copilot CLI 用の `~/.copilot/copilot-instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
 - GitHub Copilot for VS Code 用の `~/.copilot/instructions/agents-global.instructions.md` は `AGENTS.md` から生成される（既存があればバックアップ）
 - `AGENTS.md` は Codex 用に `~/.codex/AGENTS.md` にもコピーされる（既存があればバックアップ。`~/.codex/` 内の `config.toml` や `auth.json` は削除・変更しない）
+- `.claude/agents/*.agent.md` は Codex custom agents 用の TOML に変換され、`~/.codex/agents/*.toml` に生成される（既存があればバックアップ）
 - `.claude/skills/` 配下の各スキルは Codex 用に `~/.agents/skills/` にもコピーされる（`~/.agents/skills/` 全体はバックアップされるが削除はされず、このリポジトリと同名のスキルのみ置き換える）
 
 インストール後の主な配置先は以下のとおり。
@@ -79,6 +84,7 @@ Unblock-File .\install.ps1
 ~/.copilot/copilot-instructions.md
 ~/.copilot/instructions/agents-global.instructions.md
 ~/.codex/AGENTS.md
+~/.codex/agents/
 ~/.agents/skills/
 ~/.claude/CLAUDE.md
 ~/.claude/settings.json

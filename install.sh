@@ -6,6 +6,10 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CLAUDE_TARGET="$HOME/.claude"
 CODEX_TARGET="$HOME/.codex"
 AGENTS_SKILLS_TARGET="$HOME/.agents/skills"
+<<<<<<< 6wpy5e-codex/reviewconflict
+CODEX_AGENTS_TARGET="$HOME/.codex/agents"
+=======
+>>>>>>> master
 COPILOT_WORKSPACE_TARGET="$HOME/.github/copilot-instructions.md"
 COPILOT_CLI_TARGET="$HOME/.copilot/copilot-instructions.md"
 COPILOT_VSCODE_TARGET="$HOME/.copilot/instructions/agents-global.instructions.md"
@@ -62,6 +66,98 @@ write_copilot_instructions() {
   } > "$dest"
 }
 
+toml_escape_basic_string() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+agent_frontmatter_value() {
+  key=$1
+  src=$2
+  awk -v key="$key" -v q="'" '
+    NR == 1 {
+      line = $0
+      sub(/\r$/, "", line)
+      if (line == "---") {
+        in_frontmatter = 1
+        next
+      }
+      exit
+    }
+    in_frontmatter {
+      line = $0
+      sub(/\r$/, "", line)
+      if (line == "---") {
+        exit
+      }
+      pattern = "^" key ":[[:space:]]*"
+      if (line ~ pattern) {
+        sub(pattern, "", line)
+        sub(/[[:space:]]*$/, "", line)
+        if ((line ~ /^"[^"]*"$/) || (line ~ "^" q "[^" q "]*" q "$")) {
+          line = substr(line, 2, length(line) - 2)
+        }
+        print line
+        exit
+      }
+    }
+  ' "$src"
+}
+
+write_agent_body() {
+  src=$1
+  awk '
+    {
+      line = $0
+      sub(/\r$/, "", line)
+    }
+    NR == 1 {
+      if (line == "---") {
+        in_frontmatter = 1
+        next
+      }
+      print line
+      next
+    }
+    in_frontmatter {
+      if (line == "---") {
+        in_frontmatter = 0
+      }
+      next
+    }
+    { print line }
+  ' "$src"
+}
+
+write_codex_agent() {
+  src=$1
+  dest=$2
+
+  if [ ! -f "$src" ]; then
+    printf 'missing source file: %s\n' "$src" >&2
+    exit 1
+  fi
+
+  agent_file=$(basename -- "$src")
+  agent_name=${agent_file%.agent.md}
+  frontmatter_name=$(agent_frontmatter_value name "$src")
+  if [ -n "$frontmatter_name" ]; then
+    agent_name=$frontmatter_name
+  fi
+  description=$(agent_frontmatter_value description "$src")
+  if [ -z "$description" ]; then
+    description="Imported from Claude agent ${agent_file%.agent.md}."
+  fi
+
+  mkdir -p "$(dirname -- "$dest")"
+  {
+    printf 'name = "%s"\n' "$(toml_escape_basic_string "$agent_name")"
+    printf 'description = "%s"\n' "$(toml_escape_basic_string "$description")"
+    printf "developer_instructions = '''\n"
+    write_agent_body "$src"
+    printf "'''\n"
+  } > "$dest"
+}
+
 backup_existing() {
   src=$1
   name=$2
@@ -108,6 +204,17 @@ backup_existing "$CODEX_TARGET/AGENTS.md" "codex-AGENTS.md"
 copy_file "$ROOT_DIR/AGENTS.md" "$CODEX_TARGET/AGENTS.md"
 
 printf 'Installed Codex instructions to %s/AGENTS.md\n' "$CODEX_TARGET"
+
+backup_existing "$CODEX_AGENTS_TARGET" "codex-agents"
+mkdir -p "$CODEX_AGENTS_TARGET"
+for agent_file in "$ROOT_DIR/.claude/agents"/*.agent.md; do
+  [ -f "$agent_file" ] || continue
+  agent_name=$(basename -- "$agent_file")
+  agent_name=${agent_name%.agent.md}
+  write_codex_agent "$agent_file" "$CODEX_AGENTS_TARGET/$agent_name.toml"
+done
+
+printf 'Installed Codex agents to %s\n' "$CODEX_AGENTS_TARGET"
 
 # Codex は Agent Skills を ~/.agents/skills から読む（.agents/skills 規約）。
 # ~/.agents/skills は他ツールと共有され得るため全体は削除せず、
