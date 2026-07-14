@@ -90,7 +90,7 @@ function ConvertTo-TomlBasicString {
 
 function Get-AgentFrontmatterValue {
   param(
-    [Parameter(Mandatory = $true)][string[]]$Lines,
+    [Parameter(Mandatory = $true)][AllowEmptyCollection()][AllowEmptyString()][string[]]$Lines,
     [Parameter(Mandatory = $true)][string]$Key
   )
 
@@ -116,7 +116,7 @@ function Get-AgentFrontmatterValue {
 }
 
 function Get-AgentBody {
-  param([Parameter(Mandatory = $true)][string[]]$Lines)
+  param([Parameter(Mandatory = $true)][AllowEmptyCollection()][AllowEmptyString()][string[]]$Lines)
 
   if ($Lines.Count -eq 0 -or $Lines[0].TrimEnd("`r") -ne "---") {
     return $Lines
@@ -224,7 +224,7 @@ $SourceAgents = Join-Path (Join-Path $RootDir ".claude") "agents"
 Get-ChildItem -LiteralPath $SourceAgents -Filter "*.agent.md" -File | ForEach-Object {
   $AgentName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($_.Name))
   $AgentTarget = Join-Path $CodexAgentsTarget "$AgentName.toml"
-  Write-CodexAgent $_.FullName $AgentTarget
+  Write-CodexAgent -Source $_.FullName -Destination $AgentTarget
 }
 
 Write-Host "Installed Codex agents to $CodexAgentsTarget"
