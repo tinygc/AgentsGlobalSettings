@@ -4,10 +4,7 @@ $RootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ClaudeTarget = Join-Path $HOME ".claude"
 $CodexTarget = Join-Path $HOME ".codex"
 $AgentsSkillsTarget = Join-Path (Join-Path $HOME ".agents") "skills"
-<<<<<<< 6wpy5e-codex/reviewconflict
 $CodexAgentsTarget = Join-Path $CodexTarget "agents"
-=======
->>>>>>> master
 $CopilotWorkspaceTarget = Join-Path (Join-Path $HOME ".github") "copilot-instructions.md"
 $CopilotCliTarget = Join-Path (Join-Path $HOME ".copilot") "copilot-instructions.md"
 $CopilotVsCodeTarget = Join-Path (Join-Path (Join-Path $HOME ".copilot") "instructions") "agents-global.instructions.md"
@@ -93,7 +90,7 @@ function ConvertTo-TomlBasicString {
 
 function Get-AgentFrontmatterValue {
   param(
-    [Parameter(Mandatory = $true)][string[]]$Lines,
+    [Parameter(Mandatory = $true)][AllowEmptyCollection()][AllowEmptyString()][string[]]$Lines,
     [Parameter(Mandatory = $true)][string]$Key
   )
 
@@ -119,7 +116,7 @@ function Get-AgentFrontmatterValue {
 }
 
 function Get-AgentBody {
-  param([Parameter(Mandatory = $true)][string[]]$Lines)
+  param([Parameter(Mandatory = $true)][AllowEmptyCollection()][AllowEmptyString()][string[]]$Lines)
 
   if ($Lines.Count -eq 0 -or $Lines[0].TrimEnd("`r") -ne "---") {
     return $Lines
@@ -150,15 +147,15 @@ function Write-CodexAgent {
   $lines = @(Get-Content -LiteralPath $Source -Encoding UTF8)
   $sourceLeaf = Split-Path -Leaf $Source
   $fileBaseName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($sourceLeaf))
-  $agentName = Get-AgentFrontmatterValue $lines "name"
+  $agentName = Get-AgentFrontmatterValue -Lines $lines -Key "name"
   if (-not $agentName) {
     $agentName = $fileBaseName
   }
-  $description = Get-AgentFrontmatterValue $lines "description"
+  $description = Get-AgentFrontmatterValue -Lines $lines -Key "description"
   if (-not $description) {
     $description = "Imported from Claude agent $fileBaseName."
   }
-  $body = Get-AgentBody $lines
+  $body = Get-AgentBody -Lines $lines
 
   $parent = Split-Path -Parent $Destination
   if ($parent) {
@@ -227,7 +224,7 @@ $SourceAgents = Join-Path (Join-Path $RootDir ".claude") "agents"
 Get-ChildItem -LiteralPath $SourceAgents -Filter "*.agent.md" -File | ForEach-Object {
   $AgentName = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetFileNameWithoutExtension($_.Name))
   $AgentTarget = Join-Path $CodexAgentsTarget "$AgentName.toml"
-  Write-CodexAgent $_.FullName $AgentTarget
+  Write-CodexAgent -Source $_.FullName -Destination $AgentTarget
 }
 
 Write-Host "Installed Codex agents to $CodexAgentsTarget"
