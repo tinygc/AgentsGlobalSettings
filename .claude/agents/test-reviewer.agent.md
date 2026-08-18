@@ -1,7 +1,8 @@
 ---
 name: test-reviewer
 description: テスト仕様書が要件を十分にカバーし品質基準を満たしているかレビューします。test-designer が完了した後に呼び出してください。
-model: fable-5
+model: sonnet
+effort: medium
 tools:
   - Read
   - Grep

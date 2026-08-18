@@ -2,6 +2,7 @@
 name: implementer
 description: 要件・設計・テスト仕様に従い TDD でコードを実装します。テストを先に書いてから実装します。
 model: sonnet
+effort: high
 tools:
   - Read
   - Write

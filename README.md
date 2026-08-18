@@ -91,6 +91,36 @@ Unblock-File .\install.ps1
 ~/.claude/skills/
 ```
 
+## Sub Agent のモデルと effort
+
+`.claude/agents/*.agent.md` の frontmatter で、Sub Agent ごとに使用モデル（`model`）と推論の深さ（`effort`）を指定する。
+V字開発フローでは上流工程の判断ミスが下流全体へ波及するため、要件・設計・テスト設計とコードレビューに厚く配分し、照合作業が中心のレビューは軽くする方針を採る。
+
+| Agent | model | effort | 配分の理由 |
+|---|---|---|---|
+| requirements-analyst | opus | xhigh | 曖昧表現の検出と抜け漏れの洗い出しが全下流の起点になる |
+| requirements-reviewer | opus | xhigh | 最初の承認ゲート。ここでの見逃しが最も高くつく |
+| architect | opus | xhigh | レイヤー分離の判断と FR トレーサビリティの設計 |
+| architect-reviewer | opus | xhigh | 設計と UI 仕様の整合という複合判定 |
+| ui-designer | sonnet | （未指定） | 仕様の記述作業が中心。セッションの effort を継承する |
+| ui-reviewer | sonnet | high | 必須項目の照合が中心 |
+| test-designer | opus | xhigh | 境界値・異常系の網羅設計。抜けが致命的になる |
+| test-reviewer | sonnet | medium | トレーサビリティマトリクスの照合は機械的作業 |
+| implementer | sonnet | high | TDD の反復。Sonnet の適性に合う |
+| code-reviewer | opus | xhigh | 実装コードに向き合う唯一のレビュアー |
+
+### 注意点
+
+- **`model` に使えるのはエイリアスかフルモデルID**。エイリアスは `default` / `best` / `fable` / `sonnet` / `opus` / `haiku` / `sonnet[1m]` / `opus[1m]` / `opusplan`、および `inherit`。`fable-5` のような存在しない値を書くと `[claude-code:unrecognized_model]` 警告となり、意図したモデルで動かない
+- **`model` を省略すると `inherit`**（メインセッションと同じモデル）になる
+- **`fable` はグローバル設定に固定しない**。プランによっては usage credits 課金となり、ZDR 環境では選択できないため、配布先の環境によって動作が変わる
+- **`effort` に使えるのは `low` / `medium` / `high` / `xhigh` / `max`**。省略時はセッションの effort を継承する。モデルが未対応のレベルを指定した場合はエラーにならず、直下の対応レベルへフォールバックする（Opus 4.6 では `xhigh` → `high`）
+- **`max` は広く採用しない**。demanding なタスクで効果が出る場合はあるが、収穫逓減があり overthinking しやすいため、採用前に検証する
+- **環境変数は frontmatter より優先される**。`CLAUDE_CODE_SUBAGENT_MODEL` は全 Sub Agent の `model` を、`CLAUDE_CODE_EFFORT_LEVEL` は `effort` を上書きする。これらが設定された環境では上表の指定は効かない。逆に、コストを抑えたいセッションでは一時的な上書き手段として使える
+- **`model` と `effort` は Claude Code 専用**。`install.sh` が生成する Codex 用 TOML（`~/.codex/agents/*.toml`）は `name` / `description` / 本文のみを取り込むため、Codex 側の挙動には影響しない
+
+参考: [Subagents](https://code.claude.com/docs/en/sub-agents) / [Model configuration](https://code.claude.com/docs/en/model-config)
+
 ## 要件
 
 - POSIX sh（`install.sh` を使う場合）
