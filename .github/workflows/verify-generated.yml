@@ -1,0 +1,30 @@
+name: Verify generated files
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  installer:
+    name: install.sh の生成結果を検証
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install.sh の構文を検査
+        run: sh -n install.sh
+
+      - name: 隔離した HOME へインストールを実行
+        run: |
+          mkdir -p "${RUNNER_TEMP}/fakehome"
+          HOME="${RUNNER_TEMP}/fakehome" sh install.sh
+
+      - name: Copilot 指示ファイルがミラーと一致するか検査
+        run: |
+          generated="${RUNNER_TEMP}/fakehome/.github/copilot-instructions.md"
+          if ! diff -u .github/copilot-instructions.md "$generated"; then
+            echo "::error file=.github/copilot-instructions.md::AGENTS.md と .github/copilot-instructions.md が乖離しています。install.sh を実行し、生成された ~/.github/copilot-instructions.md でリポジトリ内のミラーを更新してください。"
+            exit 1
+          fi
+          echo "ミラーは AGENTS.md と同期しています"

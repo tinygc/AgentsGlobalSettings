@@ -11,7 +11,9 @@ Claude Code / GitHub Copilot / OpenAI Codex CLI 向けのグローバル設定�
 ```
 AGENTS.md                 # グローバル共通指示（言語・トーン・開発プロセス）
 .github/
-  copilot-instructions.md # GitHub Copilot 用の共通指示ミラー
+  copilot-instructions.md # GitHub Copilot 用の共通指示ミラー（install.sh が生成）
+  workflows/
+    verify-generated.yml  # 生成物の同期を検証する CI
 install.sh                # Linux / macOS / Git Bash 向けインストーラ
 install.cmd               # Windows 向け起動ラッパー（ExecutionPolicy Bypass）
 install.ps1               # Windows PowerShell 向けインストーラ本体
@@ -120,6 +122,26 @@ V字開発フローでは上流工程の判断ミスが下流全体へ波及す�
 - **`model` と `effort` は Claude Code 専用**。`install.sh` が生成する Codex 用 TOML（`~/.codex/agents/*.toml`）は `name` / `description` / 本文のみを取り込むため、Codex 側の挙動には影響しない
 
 参考: [Subagents](https://code.claude.com/docs/en/sub-agents) / [Model configuration](https://code.claude.com/docs/en/model-config)
+
+## 生成物の同期
+
+`.github/copilot-instructions.md` は `AGENTS.md` から `install.sh` が生成するミラーであり、手で編集しない。
+`AGENTS.md` を変更した場合は、次の手順でミラーを更新してからコミットする。
+実際の `~/.claude/` を書き換えないよう、隔離した `HOME` へインストールして生成物だけを取り出す。
+
+```sh
+tmp="$(mktemp -d)"
+HOME="$tmp" sh install.sh >/dev/null
+cp "$tmp/.github/copilot-instructions.md" .github/copilot-instructions.md
+rm -rf "$tmp"
+```
+
+`.github/workflows/verify-generated.yml` が push と pull request で以下を検証する。
+
+- `install.sh` の構文（`sh -n`）
+- 隔離した `HOME` へインストールを実行し、生成された Copilot 指示ファイルがリポジトリ内のミラーと一致すること
+
+ミラーが乖離している場合は CI が失敗する。
 
 ## 要件
 
