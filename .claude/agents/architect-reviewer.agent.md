@@ -1,7 +1,8 @@
 ---
 name: architect-reviewer
 description: アーキテクチャ設計書が要件を満たし Clean Architecture に準拠しているか、UI 仕様書との整合性を含めてレビューします。architect・ui-designer が完了した後に呼び出してください。
-model: fable-5
+model: opus
+effort: xhigh
 tools:
   - Read
   - Grep

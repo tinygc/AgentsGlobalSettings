@@ -1,7 +1,8 @@
 ---
 name: ui-reviewer
 description: UI 仕様書が要件を満たし、画面遷移・入力/出力・メッセージ定義が明確で使いやすいかレビューします。ui-designer が完了した後に呼び出してください。
-model: fable-5
+model: sonnet
+effort: high
 tools:
   - Read
   - Grep

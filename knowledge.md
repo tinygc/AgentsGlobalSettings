@@ -289,6 +289,17 @@ Instructions とは、AI Agent に守らせたいルールや行動方針を記�
 - 入出力をログに残しておくと、どのAgentで情報が欠落したか追跡しやすい
 - 最初は逐次実行（直列）で動作を確認してから、並列化に移行する
 
+**モデルと effort の配分（Claude Code）**
+- frontmatter で `model` と `effort` を Sub Agent 単位に指定できる。`model` 省略時は `inherit`（親セッションと同じモデル）、`effort` 省略時はセッションの effort を継承する
+- `model` に使えるのはエイリアス（`default` / `best` / `fable` / `sonnet` / `opus` / `haiku` / `sonnet[1m]` / `opus[1m]` / `opusplan` / `inherit`）かフルモデルID。存在しない値（例: `fable-5`）は `[claude-code:unrecognized_model]` となり、意図したモデルで動かない
+- `effort` は `low` / `medium` / `high` / `xhigh` / `max`。既定は `high`。モデルが未対応のレベルはエラーにならず直下の対応レベルへフォールバックする（Opus 4.6 では `xhigh` → `high`）
+- `max` は収穫逓減があり overthinking しやすいため、広く採用する前に検証する
+- 環境変数 `CLAUDE_CODE_SUBAGENT_MODEL` と `CLAUDE_CODE_EFFORT_LEVEL` は frontmatter より優先される。設定済み環境では定義側の指定が効かない一方、コストを抑えたいセッションの一時的な上書き手段になる
+- 配分の考え方は「上流と最終レビューに厚く、照合作業に薄く」。判断が発散する工程（要件の曖昧さ除去、レイヤー設計、境界値のテスト設計、コードレビュー）へ上位モデルと高い effort を割り当て、確定済み仕様の項目照合は下位モデルと低い effort で足りる
+- 特定プランで usage credits 課金となるモデルや ZDR 環境で選択できないモデル（Fable 系）は、複数環境へ配布する設定の既定値にしない
+- `model` と `effort` は Claude Code 固有。`install.sh` が生成する Codex 用 TOML は `name` / `description` / 本文のみを取り込むため引き継がれない。Codex 側で同等の制御を行う場合は `~/.codex/config.toml` の `model` と `model_reasoning_effort` を使う
+- 参考: [Subagents](https://code.claude.com/docs/en/sub-agents) / [Model configuration](https://code.claude.com/docs/en/model-config)
+
 ## Skills
 
 | 観点 | 内容 |
