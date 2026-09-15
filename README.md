@@ -27,7 +27,8 @@ knowledge.md              # 設定体系のリファレンスメモ
   skills/                 # スキル定義（<name>/SKILL.md）
     orchestrate-workflow/ # V字開発フローの進行管理
     session-retrospective/ # セッション振り返りと改善反映
-  hooks/                  # フック（.gitkeep）
+  hooks/
+    subagent_gate.py      # Sub Agent 承認ゲートの検査フック
 ```
 
 ## インストール
@@ -92,6 +93,28 @@ Unblock-File .\install.ps1
 ~/.claude/hooks/
 ~/.claude/skills/
 ```
+
+## Sub Agent 承認ゲートのフック
+
+`AGENTS.md` は V字開発と TDD を前提にフェーズ運用を定めるが、指示文だけでは実行環境の既定方針（「明示的に依頼されない限り Sub Agent を使わない」）と衝突したときに Sub Agent を経由しないまま実装が進む余地が残る。`.claude/hooks/subagent_gate.py` はこの余地を機械的に塞ぐ。
+
+`.claude/settings.json` が次の3イベントから同スクリプトを呼び出す。
+
+| イベント | サブコマンド | 役割 |
+|---|---|---|
+| `SubagentStart` | `record-subagent` | Sub Agent が起動した事実を記録する |
+| `PostToolUse`（`Write\|Edit\|MultiEdit`） | `record-edit` | 実装コード・テストコードの編集を記録する |
+| `Stop` | `check-stop` | 「コードを編集したが Sub Agent 未起動」のとき `decision: block` を返し、ターンを継続させて判断を促す |
+
+判定の詳細と適用対象外の条件は `.claude/skills/orchestrate-workflow/SKILL.md` の「Sub Agent 使用の厳格化」を正本とする。
+
+### 注意点
+
+- **ブロックはセッションごとに1回のみ**。恒久的にブロックすると、typo 修正のようなフェーズ運用の対象外の作業でターンを終了できなくなるため、1回だけ差し込む設計としている。絶対的な禁止ではなく、判断を省略できなくするための仕組みである
+- **判定はファイル拡張子に基づく**。`.md` / `.json` / `.xml` のみの変更では発火しない。「既存の要件・設計・テスト仕様に変更が及ぶか」はフックでは判定できないため、その線引きは Skill の記述に委ねている
+- **状態はセッション単位の一時ファイル**（`<一時ディレクトリ>/claude-subagent-gate/<session_id>.json`）に持つ。`install.sh` は `~/.claude` を作り直すため、インストール中に状態が失われる位置を避けている
+- **`python3` が PATH にあることを前提とする**。Windows で `python3` が解決できない環境ではフックが実行できない。その場合は `.claude/settings.json` の `command` を当該環境の Python 実行ファイル名（`python` など）へ変更すること。フック自身の障害はユーザーの作業を止めない（例外を握りつぶして exit 0 する）が、その場合ゲートは機能しない
+- フックの有効・無効の確認と一時停止は Claude Code の `/hooks` から行う
 
 ## Sub Agent のモデルと effort
 
